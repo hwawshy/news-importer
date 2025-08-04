@@ -1,0 +1,34 @@
+services:
+  nginx:
+    container_name: 'news-importer-nginx'
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+    cap_add:
+      - SYS_PTRACE
+    ports:
+      - "80:80"
+    volumes:
+      - "./app/public:/app/public"
+    networks:
+      - news-importer-network
+
+  php:
+    container_name: news-importer-php
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    cap_add:
+      - SYS_PTRACE
+    volumes:
+      - ./app:/app
+    working_dir: /app
+    networks:
+      - news-importer-network
+    environment:
+      PHP_IDE_CONFIG: 'serverName=news-importer'
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+networks:
+  news-importer-network:
