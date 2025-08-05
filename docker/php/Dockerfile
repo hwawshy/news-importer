@@ -22,6 +22,12 @@ xdebug.discover_client_host=0\
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 RUN sed -ri -e 's!;date.timezone =!date.timezone = "Europe/Berlin"!g' /usr/local/etc/php/php.ini
 
+# set post_max_size to max 32-bit signed int value and upload_max_filesize to a byte less
+RUN sed -ri \
+      -e 's!^;?\s*post_max_size\s*=.*!post_max_size = 2147483647!' \
+      -e 's!^;?\s*upload_max_filesize\s*=.*!upload_max_filesize = 2147483646!' \
+      /usr/local/etc/php/php.ini
+
 FROM composer:latest as composer
 
 FROM build as prepare
