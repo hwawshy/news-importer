@@ -49,6 +49,15 @@ services:
       - news-importer-database:/var/lib/mysql
     command: mysqld --general-log=1 --general-log-file=/var/lib/mysql/general-log.log
 
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: 'news-importer-rabbitmq'
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - news-importer-network
+
 networks:
   news-importer-network:
 

@@ -1,7 +1,7 @@
 FROM php:8.4-fpm AS build
 
 RUN apt-get update && apt-get upgrade -y
-RUN apt-get install -y libzip-dev unzip zip git
+RUN apt-get install -y libzip-dev unzip zip git librabbitmq-dev
 
 RUN docker-php-ext-install pdo_mysql
 RUN docker-php-ext-install zip
@@ -9,6 +9,7 @@ RUN docker-php-ext-install zip
 #RUN docker-php-ext-install sockets
 
 RUN pecl install xdebug-3.4.4 && docker-php-ext-enable xdebug
+RUN pecl install amqp-1.11.0 && docker-php-ext-enable amqp
 
 RUN echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)\n\
 xdebug.mode=debug\n\

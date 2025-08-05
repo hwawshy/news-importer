@@ -58,4 +58,14 @@ class Import
     {
         return $this->id;
     }
+
+    public function setImportEndAt(?DateTime $importEndAt): void
+    {
+        $this->importEndAt = $importEndAt;
+    }
+
+    public function setStatus(ImportStatusEnumeration $status): void
+    {
+        $this->status = $status;
+    }
 }
