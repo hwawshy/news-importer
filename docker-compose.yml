@@ -29,6 +29,28 @@ services:
       PHP_IDE_CONFIG: 'serverName=news-importer'
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    depends_on:
+      mysql:
+        condition: service_started
+
+  mysql:
+    container_name: news-importer-mysql
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: news-importer
+      MYSQL_PASSWORD: news-importer
+      MYSQL_DATABASE: news-importer
+    ports:
+      - '3306:3306'
+    networks:
+      - news-importer-network
+    volumes:
+      - news-importer-database:/var/lib/mysql
+    command: mysqld --general-log=1 --general-log-file=/var/lib/mysql/general-log.log
 
 networks:
   news-importer-network:
+
+volumes:
+  news-importer-database:
