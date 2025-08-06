@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Repository\ImportRepository;
 use App\Service\ImportService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -14,10 +15,11 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapUploadedFile;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class UploadController extends AbstractController
+class ImportController extends AbstractController
 {
     private const int MAX_FILENAME_LENGTH = 50;
 
@@ -25,12 +27,13 @@ class UploadController extends AbstractController
         private readonly SluggerInterface $slugger,
         private readonly LoggerInterface $logger,
         private readonly ImportService $importService,
+        private readonly ImportRepository $importRepository,
         #[Autowire('%data_dir%')]
         private readonly string $dataDir,
     ) {
     }
 
-    #[Route('/upload', methods: ['POST'])]
+    #[Route('/upload', name: 'file_upload', methods: ['POST'])]
     public function upload(
         #[MapUploadedFile([new Assert\File(mimeTypes: ['text/csv', 'text/plain'])])] UploadedFile $file
     ): JsonResponse {
@@ -48,5 +51,16 @@ class UploadController extends AbstractController
         $id = $this->importService->startImport($newFilename);
 
         return new JsonResponse(['importId' => $id]);
+    }
+
+    #[Route('/status/{id}', requirements: ['id' => Requirement::UUID_V7], methods: ['GET'])]
+    public function status(string $id): JsonResponse
+    {
+        $import = $this->importRepository->find($id);
+        if ($import === null) {
+            return new JsonResponse(null, Response::HTTP_NOT_FOUND);
+        }
+
+        return new JsonResponse(['status' => $import->getStatus()->value]);
     }
 }

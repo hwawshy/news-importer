@@ -73,4 +73,9 @@ class Import
     {
         $this->status = $status;
     }
+
+    public function getStatus(): ImportStatusEnumeration
+    {
+        return $this->status;
+    }
 }
