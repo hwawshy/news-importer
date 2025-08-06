@@ -1,0 +1,62 @@
+[
+    {
+        "message": "Field 'title' cannot be blank",
+        "line": 2
+    },
+    {
+        "message": "Field 'content' cannot be blank",
+        "line": 3
+    },
+    {
+        "message": "Field 'category' cannot be blank",
+        "line": 4
+    },
+    {
+        "message": "Field 'title' cannot be longer than 255 characters",
+        "line": 5
+    },
+    {
+        "message": "Filed 'category' must be a non-empty list of dash-separated categories",
+        "line": 6
+    },
+    {
+        "message": "Filed 'category' must be a non-empty list of dash-separated categories",
+        "line": 7
+    },
+    {
+        "message": "Filed 'category' must be a non-empty list of dash-separated categories",
+        "line": 8
+    },
+    {
+        "message": "The field 'url' must satisfy at least one of the following constraints [1] This value should be blank. [2] The url \"no valid url\" is not a valid url",
+        "line": 9
+    },
+    {
+        "title": "one category",
+        "content": "some content",
+        "categories": [
+            "one category"
+        ],
+        "url": "https://www.google.com"
+    },
+    {
+        "title": "multiple categories",
+        "content": "some content",
+        "categories": [
+            "one category",
+            "other category",
+            "third category"
+        ],
+        "url": "https://www.google.com"
+    },
+    {
+        "title": "no url",
+        "content": "content",
+        "categories": [
+            "one category",
+            "other category",
+            "third category"
+        ],
+        "url": null
+    }
+]

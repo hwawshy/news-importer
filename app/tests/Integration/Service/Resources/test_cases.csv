@@ -1,0 +1,13 @@
+title,content,category,url
+,empty title,category1,https://www.google.com
+empty content,,category1,https://www.google.com
+no category, some content,,https://www.google.com
+a very long title a very long title a very long title a very long title a very long title a very long title a very long title a very long title a very long title a very long title a very long title a very long title a very long title a very long title a very long title,content,category,https://www.google.com
+wrong category format,content,-category1-category2-,https://www.google.com
+wrong category format,content,-category1-category2,https://www.google.com
+wrong category format,content,category1-category2-,https://www.google.com
+not a valid url,some content,category1,no valid url
+one category,some content,one category,https://www.google.com
+multiple categories,some content,one category-other category-third category,https://www.google.com
+no url,content,one category-other category-third category,
+

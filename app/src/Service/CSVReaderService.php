@@ -22,7 +22,7 @@ readonly class CSVReaderService
      */
     public function read(string $filepath): iterable
     {
-        $handle = fopen($filepath, 'r');
+        $handle = @fopen($filepath, 'r');
         if ($handle === false) {
             throw new \RuntimeException(sprintf("Can't open %s", $filepath));
         }
@@ -82,7 +82,9 @@ readonly class CSVReaderService
     {
         $constraint = new Assert\Collection([
             'title' => new Assert\Required([
-                new Assert\NotBlank,
+                new Assert\NotBlank(
+                    message: "Field 'title' cannot be blank"
+                ),
                 new Assert\Length(
                     max: 255,
                     maxMessage: "Field 'title' cannot be longer than {{ limit }} characters",
@@ -94,8 +96,11 @@ readonly class CSVReaderService
                 ),
             ]),
             'category' => new Assert\Required([
+                new Assert\NotBlank(
+                    message: "Field 'category' cannot be blank"
+                ),
                 new Assert\Regex(
-                    pattern: '/^[A-Za-z0-9]+(-[A-Za-z0-9]+)*$/',
+                    pattern: "/^[A-Za-z0-9 ]+(-[A-Za-z0-9 ]+)*$/",
                     message: "Filed 'category' must be a non-empty list of dash-separated categories"
                 )
             ]),
@@ -103,9 +108,11 @@ readonly class CSVReaderService
                 new Assert\AtLeastOneOf([
                     new Assert\Blank,
                     new Assert\Url(
-                        message: 'The url {{ value }} is not a valid url'
-                    )
-                ])
+                        message: 'The url {{ value }} is not a valid url',
+                        requireTld: true
+                    )],
+                    message: "The field 'url' must satisfy at least one of the following constraints"
+                )
             ])
         ]);
 
@@ -118,8 +125,8 @@ readonly class CSVReaderService
                 explode('-', $row['category']),
                 $row['url'] === '' ? null : $row['url']
             );
-        } else {
-            return new CSVRowError($errors[0]->getMessage(), $line);
         }
+
+        return new CSVRowError($errors[0]->getMessage(), $line);
     }
 }
