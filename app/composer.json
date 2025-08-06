@@ -10,6 +10,7 @@
         "doctrine/doctrine-bundle": "*",
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/orm": "^3.5",
+        "openspout/openspout": "^4.30",
         "phpdocumentor/reflection-docblock": "^5.6",
         "phpstan/phpdoc-parser": "^2.2",
         "symfony/amqp-messenger": "7.3.*",
@@ -60,7 +61,7 @@
     "scripts": {
         "db-migrate": [
             "bin/console doctrine:database:create --if-not-exists",
-            "bin/console doctrine:migrations:migrate"
+            "bin/console doctrine:migrations:migrate --no-interaction"
         ],
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
