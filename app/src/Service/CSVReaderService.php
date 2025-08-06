@@ -13,7 +13,7 @@ readonly class CSVReaderService
 {
     public function __construct(private ValidatorInterface $validator) {}
 
-    private const int CHUNK_SIZE = 500;
+    public const int CHUNK_SIZE = 500;
 
     private const array HEADER_FIELDS = ['title', 'content', 'category', 'url'];
 

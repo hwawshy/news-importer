@@ -54,6 +54,11 @@ class Import
         $this->importFile = $importFile;
     }
 
+    public function getImportFile(): string
+    {
+        return $this->importFile;
+    }
+
     public function getId(): Uuid
     {
         return $this->id;

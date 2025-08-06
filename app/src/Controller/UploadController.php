@@ -25,7 +25,7 @@ class UploadController extends AbstractController
         private readonly SluggerInterface $slugger,
         private readonly LoggerInterface $logger,
         private readonly ImportService $importService,
-        #[Autowire('%kernel.project_dir%/data')]
+        #[Autowire('%data_dir%')]
         private readonly string $dataDir,
     ) {
     }
