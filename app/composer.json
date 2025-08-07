@@ -63,6 +63,12 @@
             "bin/console doctrine:database:create --if-not-exists",
             "bin/console doctrine:migrations:migrate --no-interaction"
         ],
+        "test": [
+            "bin/console doctrine:database:drop --force --env=test || echo \"db already dropped\"",
+            "php bin/console doctrine:database:create --env=test --if-not-exists",
+            "bin/console doctrine:migrations:migrate --no-interaction --env=test",
+            "bin/phpunit --testdox"
+        ],
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd"

@@ -94,6 +94,11 @@ class Import implements \JsonSerializable
         return $this->errorFile;
     }
 
+    public function getRowCount(): ?int
+    {
+        return $this->rowCount;
+    }
+
     public function jsonSerialize(): array
     {
         return [

@@ -37,9 +37,19 @@ class News
         $this->title = $title;
     }
 
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
     public function setContent(string $content): void
     {
         $this->content = $content;
+    }
+
+    public function getContent(): string
+    {
+        return $this->content;
     }
 
     public function setCategories(string $categories): void
@@ -47,8 +57,18 @@ class News
         $this->categories = $categories;
     }
 
+    public function getCategories(): string
+    {
+        return $this->categories;
+    }
+
     public function setUrl(?string $url): void
     {
         $this->url = $url;
+    }
+
+    public function getUrl(): ?string
+    {
+        return $this->url;
     }
 }

@@ -14,12 +14,12 @@ use LogicException;
  */
 class BaseRepository extends EntityRepository implements ServiceEntityRepositoryInterface
 {
-    private EntityManagerInterface $em;
+    protected EntityManagerInterface $em;
 
     /**
      * @var EntityRepository<T>
      */
-    private EntityRepository $decorated;
+    protected EntityRepository $decorated;
 
     /**
      * @param class-string<T> $entityClass
@@ -96,5 +96,12 @@ class BaseRepository extends EntityRepository implements ServiceEntityRepository
 
         $this->em        = $manager;
         $this->decorated = new EntityRepository($this->em, $this->em->getClassMetadata($this->entityClass));
+    }
+
+    public function deleteAll(): void
+    {
+        $this->em->getConnection()->executeStatement(
+            sprintf("DELETE FROM `%s`", $this->em->getClassMetadata($this->entityClass)->getTableName())
+        );
     }
 }
