@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Enumeration\ImportStatusEnumeration;
 use App\Repository\ImportRepository;
 use App\Service\ImportService;
 use Psr\Log\LoggerInterface;
@@ -66,6 +67,12 @@ class ImportController extends AbstractController
         }
 
         return new JsonResponse(['status' => $import->getStatus()->value]);
+    }
+
+    #[Route('/list/{status}', name: 'list_by_status', methods: ['GET'])]
+    public function list(ImportStatusEnumeration $status): JsonResponse
+    {
+        return new JsonResponse($this->importRepository->findBy(['status' => $status]));
     }
 
     #[Route('/errors/{id}', requirements: ['id' => Requirement::UUID_V7], methods: ['GET'])]

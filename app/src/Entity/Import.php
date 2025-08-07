@@ -15,7 +15,7 @@ use Symfony\Component\Uid\Uuid;
 #[ORM\Index(name: 'ix_status', columns: ['status'])]
 #[ORM\Entity(repositoryClass: ImportRepository::class)]
 #[ORM\HasLifecycleCallbacks]
-class Import
+class Import implements \JsonSerializable
 {
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
@@ -92,5 +92,18 @@ class Import
     public function getErrorFile(): ?string
     {
         return $this->errorFile;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->id,
+            'importFile' => $this->importFile,
+            'status' => $this->status,
+            'importStartAt' => $this->importStartAt?->format(\DateTimeInterface::ATOM),
+            'importEndAt' => $this->importEndAt?->format(\DateTimeInterface::ATOM),
+            'rowCount' => $this->rowCount,
+            'errorFile' => $this->errorFile
+        ];
     }
 }

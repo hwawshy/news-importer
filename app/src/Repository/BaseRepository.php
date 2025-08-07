@@ -50,6 +50,11 @@ class BaseRepository extends EntityRepository implements ServiceEntityRepository
         return $this->decorated->findAll();
     }
 
+    public function findBy(array $criteria, array|null $orderBy = null, int|null $limit = null, int|null $offset = null): array
+    {
+        return $this->decorated->findBy($criteria, $orderBy, $limit, $offset);
+    }
+
     /**
      * @param T $entity
      * @return void
