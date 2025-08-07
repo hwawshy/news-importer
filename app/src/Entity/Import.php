@@ -78,4 +78,19 @@ class Import
     {
         return $this->status;
     }
+
+    public function setRowCount(?int $rowCount): void
+    {
+        $this->rowCount = $rowCount;
+    }
+
+    public function setErrorFile(?string $errorFile): void
+    {
+        $this->errorFile = $errorFile;
+    }
+
+    public function getErrorFile(): ?string
+    {
+        return $this->errorFile;
+    }
 }

@@ -9,8 +9,12 @@ use App\Service\ImportService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Filesystem\Path;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\Stream;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapUploadedFile;
@@ -62,5 +66,27 @@ class ImportController extends AbstractController
         }
 
         return new JsonResponse(['status' => $import->getStatus()->value]);
+    }
+
+    #[Route('/errors/{id}', requirements: ['id' => Requirement::UUID_V7], methods: ['GET'])]
+    public function streamErrorFile(string $id): Response
+    {
+        $import = $this->importRepository->find($id);
+        if ($import?->getErrorFile() === null) {
+            return new Response(null, Response::HTTP_NOT_FOUND);
+        }
+
+        $stream = new Stream(Path::join($this->dataDir, $import->getErrorFile()));
+        $response = new BinaryFileResponse($stream);
+
+        $disposition = HeaderUtils::makeDisposition(
+            HeaderUtils::DISPOSITION_ATTACHMENT,
+            $import->getErrorFile()
+        );
+
+        $response->headers->set('Content-Disposition', $disposition);
+        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+
+        return $response;
     }
 }

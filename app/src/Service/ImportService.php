@@ -12,6 +12,8 @@ use App\Model\CSVRowError;
 use App\Model\CSVRowResult;
 use App\Repository\ImportRepository;
 use App\Repository\NewsRepository;
+use OpenSpout\Common\Entity\Row;
+use OpenSpout\Writer\XLSX\Writer;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Path;
@@ -20,6 +22,8 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 readonly class ImportService
 {
+    private Writer $writer;
+
     public function __construct(
         private ImportRepository $importRepository,
         private NewsRepository $newsRepository,
@@ -28,7 +32,9 @@ readonly class ImportService
         private CSVReaderService $readerService,
         #[Autowire('%data_dir%')]
         private string $dataDir,
-    ) {}
+    ) {
+        $this->writer = new Writer();
+    }
 
     /**
      * @throws ExceptionInterface
@@ -58,46 +64,62 @@ readonly class ImportService
 
         $records = [];
         $errors = [];
-        $count = 0;
+        $chunkReads = 0;
+        $validRowCount = 0;
+        $openedErrorFile = false;
 
         try {
             foreach ($this->readerService->read(Path::join($this->dataDir, $import->getImportFile())) as $row) {
-                $count++;
+                $chunkReads++;
                 if ($row instanceof CSVRowResult) {
                     $records[] = $this->mapRowToEntity($row);
+                    $validRowCount++;
                 } elseif ($row instanceof CSVRowError) {
+                    if (!$openedErrorFile) {
+                        $errorFile = $this->createErrorFilename($importId);
+                        $import->setErrorFile($errorFile);
+                        $this->writer->openToFile(Path::join($this->dataDir, $errorFile));
+                        $openedErrorFile = true;
+                    }
                     $errors[] = $row;
                 }
 
-                if ($count === CSVReaderService::CHUNK_SIZE) {
-                    $count = 0;
+                if ($chunkReads === CSVReaderService::CHUNK_SIZE) {
+                    $chunkReads = 0;
                     if (count($records)) {
                         $this->newsRepository->persistAll($records);
                         $records = [];
                     }
 
                     if (count($errors)) {
-
+                        foreach ($errors as $error) {
+                            $this->writer->addRow(Row::fromValues([$error->line, $error->message]));
+                        }
                     }
                 }
             }
 
-            if ($count > 0) {
+            if ($chunkReads > 0) {
                 if (count($records)) {
                     $this->newsRepository->persistAll($records);
                 }
 
                 if (count($errors)) {
-
+                    foreach ($errors as $error) {
+                        $this->writer->addRow(Row::fromValues([$error->line, $error->message]));
+                    }
                 }
             }
 
             $import->setImportEndAt(new \DateTime());
             $import->setStatus(ImportStatusEnumeration::SUCCESS);
-        } catch (\RuntimeException $e) {
+            $import->setRowCount($validRowCount);
+        } catch (\Exception $e) {
             $import->setImportEndAt(new \DateTime());
             $import->setStatus(ImportStatusEnumeration::FAILED);
             $this->logger->error(sprintf("Import with id %s failed", $import->getId()), ['exception' => $e]);
+        } finally {
+            $this->writer->close();
         }
 
         $this->importRepository->persist($import);
@@ -113,5 +135,10 @@ readonly class ImportService
         $news->setUrl($row->url);
 
         return $news;
+    }
+
+    private function createErrorFilename(string $importId): string
+    {
+        return sprintf("errors-%s.xlsx", $importId);
     }
 }
